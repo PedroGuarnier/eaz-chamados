@@ -1,0 +1,183 @@
+@page
+@model EAZ.Chamados.Pages.Chamados.ListaModel
+@{
+    ViewData["Title"] = "Painel Técnico";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <h1 class="page-title">Painel Técnico</h1>
+        <p class="page-subtitle">Gerencie e acompanhe todos os chamados de suporte.</p>
+        <div class="title-rule"></div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <span class="stat-num">@Model.TotalAbertos</span>
+            <span class="stat-label">Abertos</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num">@Model.TotalAndamento</span>
+            <span class="stat-label">Em Andamento</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num">@Model.TotalResolvidos</span>
+            <span class="stat-label">Resolvidos</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num">@Model.TotalChamados</span>
+            <span class="stat-label">Total</span>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-bar">
+        <form method="get" class="filtros-form">
+            <select name="status" onchange="this.form.submit()">
+                <option value="" selected="@(Model.FiltroStatus == "")">Todos os status</option>
+                <option value="Aberto" selected="@(Model.FiltroStatus == "Aberto")">Abertos</option>
+                <option value="Em Andamento" selected="@(Model.FiltroStatus == "Em Andamento")">Em Andamento</option>
+                <option value="Resolvido" selected="@(Model.FiltroStatus == "Resolvido")">Resolvidos</option>
+            </select>
+
+            <select name="categoria" onchange="this.form.submit()">
+                <option value="" selected="@(Model.FiltroCategoria == "")">Todas as categorias</option>
+                <option value="Hardware" selected="@(Model.FiltroCategoria == "Hardware")">Hardware</option>
+                <option value="Software" selected="@(Model.FiltroCategoria == "Software")">Software</option>
+                <option value="Impressora" selected="@(Model.FiltroCategoria == "Impressora")">Impressora</option>
+                <option value="Internet / Rede" selected="@(Model.FiltroCategoria == "Internet / Rede")">Internet / Rede</option>
+                <option value="E-mail / Outlook" selected="@(Model.FiltroCategoria == "E-mail / Outlook")">E-mail / Outlook</option>
+                <option value="Acesso / Senha" selected="@(Model.FiltroCategoria == "Acesso / Senha")">Acesso / Senha</option>
+                <option value="Microsoft 365" selected="@(Model.FiltroCategoria == "Microsoft 365")">Microsoft 365</option>
+                <option value="Telefone / Ramal" selected="@(Model.FiltroCategoria == "Telefone / Ramal")">Telefone / Ramal</option>
+                <option value="Outros" selected="@(Model.FiltroCategoria == "Outros")">Outros</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- Tabela de chamados -->
+    @if (!Model.Chamados.Any())
+    {
+        <div class="empty-state">
+            <span class="empty-icon">✦</span>
+            <p>Nenhum chamado encontrado com os filtros selecionados.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-wrapper">
+            <table class="chamados-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Solicitante</th>
+                        <th>Categoria</th>
+                        <th>Título</th>
+                        <th>Status</th>
+                        <th>Aberto em</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model.Chamados)
+                    {
+                        <tr class="chamado-row">
+                            <td class="id-col">#@c.Id</td>
+                            <td>@c.NomeSolicitante</td>
+                            <td><span class="tag-categoria">@c.Categoria</span></td>
+                            <td class="titulo-col">@c.Titulo</td>
+                            <td>
+                                <span class="badge badge-@c.Status.Replace(" ", "-").ToLower()">@c.Status</span>
+                            </td>
+                            <td class="data-col">@c.CriadoEm.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="acoes-col">
+                                <button class="btn-detalhe"
+                                    onclick="abrirModal(@c.Id, '@c.NomeSolicitante', '@c.Categoria', '@c.Titulo.Replace("'", "\\'")', '@c.Descricao.Replace("'", "\\'").Replace("\n", "\\n")', '@c.Status', '@(c.Observacao?.Replace("'", "\\'") ?? "")')">
+                                    Ver
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- Modal de detalhes / atualização -->
+<div id="modal-overlay" class="modal-overlay" onclick="fecharModal()" style="display:none">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2 class="modal-title">Chamado <span id="modal-id"></span></h2>
+            <button class="modal-close" onclick="fecharModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-info-grid">
+                <div class="modal-info-item">
+                    <span class="modal-info-label">Solicitante</span>
+                    <span id="modal-nome"></span>
+                </div>
+                <div class="modal-info-item">
+                    <span class="modal-info-label">Categoria</span>
+                    <span id="modal-categoria"></span>
+                </div>
+                <div class="modal-info-item modal-info-full">
+                    <span class="modal-info-label">Título</span>
+                    <span id="modal-titulo"></span>
+                </div>
+                <div class="modal-info-item modal-info-full">
+                    <span class="modal-info-label">Descrição</span>
+                    <span id="modal-descricao"></span>
+                </div>
+            </div>
+
+            <form method="post" asp-page-handler="Atualizar" class="modal-update-form">
+                <input type="hidden" name="id" id="form-id" />
+                <div class="campo">
+                    <label>Status</label>
+                    <select name="status" id="form-status">
+                        <option value="Aberto">Aberto</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Resolvido">Resolvido</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label>Observação do Técnico</label>
+                    <textarea name="observacao" id="form-observacao" rows="3"
+                        placeholder="Anotações sobre o atendimento..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secundario" onclick="fecharModal()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function abrirModal(id, nome, categoria, titulo, descricao, status, obs) {
+    document.getElementById('modal-id').textContent = '#' + id;
+    document.getElementById('modal-nome').textContent = nome;
+    document.getElementById('modal-categoria').textContent = categoria;
+    document.getElementById('modal-titulo').textContent = titulo;
+    document.getElementById('modal-descricao').textContent = descricao.replace(/\\n/g, '\n');
+    document.getElementById('form-id').value = id;
+    document.getElementById('form-status').value = status;
+    document.getElementById('form-observacao').value = obs;
+    document.getElementById('modal-overlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function fecharModal() {
+    document.getElementById('modal-overlay').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') fecharModal();
+});
+</script>
+}

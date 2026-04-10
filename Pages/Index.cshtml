@@ -1,0 +1,74 @@
+@page
+@model EAZ.Chamados.Pages.IndexModel
+@{
+    ViewData["Title"] = "Abrir Chamado";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <h1 class="page-title">Abrir Chamado</h1>
+        <p class="page-subtitle">Preencha o formulário abaixo para registrar sua solicitação de suporte.</p>
+        <div class="title-rule"></div>
+    </div>
+
+    @if (Model.Sucesso)
+    {
+        <div class="alert-sucesso">
+            <span class="alert-icon">✦</span>
+            <div>
+                <strong>Chamado #@Model.ChamadoId registrado com sucesso.</strong>
+                <p>Nossa equipe de TI entrará em contato em breve.</p>
+            </div>
+        </div>
+    }
+
+    <div class="form-card">
+        <form method="post">
+            <div class="form-grid">
+                <div class="campo campo-full">
+                    <label asp-for="Input.NomeSolicitante">Nome do Solicitante</label>
+                    <input asp-for="Input.NomeSolicitante" placeholder="Seu nome completo" autocomplete="name" />
+                    <span asp-validation-for="Input.NomeSolicitante" class="campo-erro"></span>
+                </div>
+
+                <div class="campo">
+                    <label asp-for="Input.Categoria">Categoria</label>
+                    <select asp-for="Input.Categoria">
+                        <option value="">Selecione a categoria...</option>
+                        <option>Hardware</option>
+                        <option>Software</option>
+                        <option>Impressora</option>
+                        <option>Internet / Rede</option>
+                        <option>E-mail / Outlook</option>
+                        <option>Acesso / Senha</option>
+                        <option>Microsoft 365</option>
+                        <option>Telefone / Ramal</option>
+                        <option>Outros</option>
+                    </select>
+                    <span asp-validation-for="Input.Categoria" class="campo-erro"></span>
+                </div>
+
+                <div class="campo">
+                    <label asp-for="Input.Titulo">Título do Problema</label>
+                    <input asp-for="Input.Titulo" placeholder="Ex: Computador não liga" />
+                    <span asp-validation-for="Input.Titulo" class="campo-erro"></span>
+                </div>
+
+                <div class="campo campo-full">
+                    <label asp-for="Input.Descricao">Descrição Detalhada</label>
+                    <textarea asp-for="Input.Descricao" rows="5"
+                        placeholder="Descreva o problema com o máximo de detalhes possível..."></textarea>
+                    <span asp-validation-for="Input.Descricao" class="campo-erro"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Enviar Chamado</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

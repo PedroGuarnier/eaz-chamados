@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — EAZ Suporte TI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="logo-area">
+                <span class="logo-initials">EAZ</span>
+                <div class="logo-text">
+                    <span class="logo-title">Escritório de Advocacia Zveiter</span>
+                    <span class="logo-sub">Suporte de Tecnologia da Informação</span>
+                </div>
+            </div>
+            <nav class="site-nav">
+                <a href="/" class="nav-link">Abrir Chamado</a>
+                <a href="/Chamados/Lista" class="nav-link">Painel Técnico</a>
+            </nav>
+        </div>
+        <div class="header-rule"></div>
+    </header>
+
+    <main class="site-main">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <span>© @DateTime.Now.Year — Escritório de Advocacia Zveiter</span>
+            <span class="footer-sep">·</span>
+            <span>Sistema Interno de Chamados de TI</span>
+        </div>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
