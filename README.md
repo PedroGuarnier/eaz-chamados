@@ -59,7 +59,7 @@ EAZ.Chamados/
 └── EAZ.Chamados.csproj
 ```
 
-## Próximos passos sugeridos
+## Próximos passos 
 
 - [ ] Autenticação simples (senha do técnico para acessar o painel)
 - [ ] Notificação por e-mail ao abrir chamado
